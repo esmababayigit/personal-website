@@ -108,63 +108,53 @@
         <button onclick="yorumEkle()">Gönder</button>
     </div>
 
-    
-    <script type="module">
-        // Firebase SDK dosyalarını içe aktar
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    <script>
+        function yorumEkle() {
+    var adInput = document.getElementById("adInput");
+    var yorumInput = document.getElementById("yorumInput");
+    var yorumlarDiv = document.getElementById("yorumlar");
 
-        const firebaseConfig = {
-          apiKey:"AIzaSyBB7UCJP9OP9t-t2skdP-KhgpnLa77IAro", 
-          authDomain: "esmaninwebsitesi-27280.firebaseapp.com",
-          databaseURL: "https://esmaninwebsitesi-27280-default-rtdb.firebaseio.com",
-          projectId: "esmaninwebsitesi-27280",
-          storageBucket: "esmaninwebsitesi-27280.firebasestorage.app",
-          messagingSenderId: "338856424812",
-          appId: "1:338856424812:web:b0fc7fa0137da86b0def49",
+    if (adInput.value.trim() !== "" && yorumInput.value.trim() !== "") {
+        var yorum = {
+            ad: adInput.value,
+            metin: yorumInput.value
         };
-      
-        // Firebase'i başlat
-        const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
 
-    // Yorum ekleme fonksiyonu
-    async function yorumEkle() {
-        const adInput = document.getElementById("adInput").value.trim();
-        const yorumInput = document.getElementById("yorumInput").value.trim();
+        var yorumlar = JSON.parse(localStorage.getItem("yorumlar")) || [];
+        yorumlar.push(yorum);
+        localStorage.setItem("yorumlar", JSON.stringify(yorumlar));
 
-        if (adInput !== "" && yorumInput !== "") {
-            try {
-                await addDoc(collection(db, "yorumlar"), {
-                    ad: adInput,
-                    yorum: yorumInput,
-                    timestamp: new Date()
-                });
+        yorumGoster();
+        adInput.value = "";
+        yorumInput.value = "";
+    }
+}
+function yorumGoster() {
+    var yorumlarDiv = document.getElementById("yorumlar");
+    yorumlarDiv.innerHTML = "";
 
-                console.log("Yorum başarıyla eklendi!");
-                yorumlariYukle(); // Yorumları tekrar yükle
-            } catch (error) {
-                console.error("Yorum eklenirken hata oluştu: ", error);
-            }
+    var yorumlar = JSON.parse(localStorage.getItem("yorumlar")) || [];
+
+    yorumlar.forEach((yorum, index) => {
+        var yorumP = document.createElement("div");
+        yorumP.classList.add("yorum");
+        yorumP.innerHTML = `<strong>${yorum.ad}:</strong> ${yorum.metin} 
+                            <button class="sil-btn" onclick="yorumSil(${index})">Sil</button>`;
+        yorumlarDiv.appendChild(yorumP);
+    });
+}
+function yorumSil(index) {
+            var yorumlar = JSON.parse(localStorage.getItem("yorumlar")) || [];
+            yorumlar.splice(index, 1);
+            localStorage.setItem("yorumlar", JSON.stringify(yorumlar));
+            yorumGoster();
         }
-    }
 
-    // Yorumları yükleme fonksiyonu
-    async function yorumlariYukle() {
-        const yorumlarDiv = document.getElementById("yorumlar");
-        yorumlarDiv.innerHTML = ""; // Önce temizle
 
-        const querySnapshot = await getDocs(collection(db, "yorumlar"));
-        querySnapshot.forEach((doc) => {
-            const veri = doc.data();
-            const yeniYorum = document.createElement("p");
-            yeniYorum.innerHTML = `<strong>${veri.ad}:</strong> ${veri.yorum}`;
-            yorumlarDiv.appendChild(yeniYorum);
-        });
-    }
+// Sayfa açıldığında yorumları yükle
+yorumGoster()
+        
 
-    // Sayfa açıldığında yorumları yükle
-    window.onload = yorumlariYukle;
         // Kalpleri rastgele arka plana ekleyen fonksiyon
         function createHearts() {
             const colors = ["#ff91a4", "#ffffff", "#c084fc", "#aee2ff"]; // Pembe, Beyaz, Mor, Bebek Mavisi
