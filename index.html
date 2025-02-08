@@ -46,7 +46,7 @@
         }
 
         .container {
-            width: 80%;
+            width: 50%;
             margin: auto;
             padding: 20px;
             background:rgb(252, 151, 195);
@@ -54,12 +54,32 @@
             position: relative;
             z-index: 1;
         }
+        .yorum {
+            background: #fff;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sil-btn {
+            background: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
 
         #yorumlar {
             margin-top: 20px;
             padding: 10px;
             background: #f9a4c6;
+            text-align: left;
         }
+
 
         input, button {
             padding: 10px;
@@ -90,18 +110,50 @@
 
     <script>
         function yorumEkle() {
-            var adInput = document.getElementById("adInput");
-            var yorumInput = document.getElementById("yorumInput");
-            var yorumlarDiv = document.getElementById("yorumlar");
-            
-            if (adInput.value.trim() !== "" && yorumInput.value.trim() !== "") {
-                var yeniYorum = document.createElement("p");
-                yeniYorum.innerHTML = "<strong>" + adInput.value + ":</strong> " + yorumInput.value;
-                yorumlarDiv.appendChild(yeniYorum);
-                adInput.value = "";
-                yorumInput.value = "";
-            }
+    var adInput = document.getElementById("adInput");
+    var yorumInput = document.getElementById("yorumInput");
+    var yorumlarDiv = document.getElementById("yorumlar");
+
+    if (adInput.value.trim() !== "" && yorumInput.value.trim() !== "") {
+        var yorum = {
+            ad: adInput.value,
+            metin: yorumInput.value
+        };
+
+        var yorumlar = JSON.parse(localStorage.getItem("yorumlar")) || [];
+        yorumlar.push(yorum);
+        localStorage.setItem("yorumlar", JSON.stringify(yorumlar));
+
+        yorumGoster();
+        adInput.value = "";
+        yorumInput.value = "";
+    }
+}
+function yorumGoster() {
+    var yorumlarDiv = document.getElementById("yorumlar");
+    yorumlarDiv.innerHTML = "";
+
+    var yorumlar = JSON.parse(localStorage.getItem("yorumlar")) || [];
+
+    yorumlar.forEach((yorum, index) => {
+        var yorumP = document.createElement("div");
+        yorumP.classList.add("yorum");
+        yorumP.innerHTML = `<strong>${yorum.ad}:</strong> ${yorum.metin} 
+                            <button class="sil-btn" onclick="yorumSil(${index})">Sil</button>`;
+        yorumlarDiv.appendChild(yorumP);
+    });
+}
+function yorumSil(index) {
+            var yorumlar = JSON.parse(localStorage.getItem("yorumlar")) || [];
+            yorumlar.splice(index, 1);
+            localStorage.setItem("yorumlar", JSON.stringify(yorumlar));
+            yorumGoster();
         }
+
+
+// Sayfa açıldığında yorumları yükle
+yorumGoster()
+        
 
         // Kalpleri rastgele arka plana ekleyen fonksiyon
         function createHearts() {
