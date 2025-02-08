@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esmosun İlk Web Sitesi🥺🫶🏻</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #faaedf;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .hearts-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 20px;
+            opacity: 0.85;
+            animation: float 15s linear infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
+
+        header {
+            background-color: #fb7fc1 ;
+            color: rgb(70, 15, 36);
+            padding: 20px;
+            font-size: 24px;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+            background:rgb(252, 151, 195);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        #yorumlar {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f9a4c6;
+        }
+
+        input, button {
+            padding: 10px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Arka Plandaki Kalpler -->
+    <div class="hearts-container"></div>
+
+    <header><b>HOŞGELDİNİZ🥺💞🤍🩷</b></header>
+
+    <div class="container">
+        <h2>MERHABA</h2>
+        <p>İlk defa deniyorum umarım güzel yapabilmişimdir🥺😭
+            Lütfen yorumlarınızı yazar mısınız🥺😭🙏🏻
+            Teşekkürler🥺💞🤍🩷
+            Sizi Seviyorum🥺💞🤍🩷</p>
+        
+        <h2>Yorumlar</h2>
+        <div id="yorumlar"></div>
+        <input type="text" id="adInput" placeholder="Adınızı yazın">
+        <input type="text" id="yorumInput" placeholder="Yorumunuzu yazın">
+        <button onclick="yorumEkle()">Gönder</button>
+    </div>
+
+    <script>
+        function yorumEkle() {
+            var adInput = document.getElementById("adInput");
+            var yorumInput = document.getElementById("yorumInput");
+            var yorumlarDiv = document.getElementById("yorumlar");
+            
+            if (adInput.value.trim() !== "" && yorumInput.value.trim() !== "") {
+                var yeniYorum = document.createElement("p");
+                yeniYorum.innerHTML = "<strong>" + adInput.value + ":</strong> " + yorumInput.value;
+                yorumlarDiv.appendChild(yeniYorum);
+                adInput.value = "";
+                yorumInput.value = "";
+            }
+        }
+
+        // Kalpleri rastgele arka plana ekleyen fonksiyon
+        function createHearts() {
+            const colors = ["#ff91a4", "#ffffff", "#c084fc", "#aee2ff"]; // Pembe, Beyaz, Mor, Bebek Mavisi
+            const emojis = ["💗", "🤍", "💜", "💙"];
+            const numHearts = 100; // Kalp sayısı
+
+            const container = document.querySelector(".hearts-container");
+
+            for (let i = 0; i < numHearts; i++) {
+                let heart = document.createElement("div");
+                heart.classList.add("heart");
+                heart.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+                heart.style.left = Math.random() * 100 + "vw";
+                heart.style.top = Math.random() * 100 + "vh";
+                heart.style.fontSize = Math.random() * 15 + 15 + "px";
+                heart.style.color = colors[Math.floor(Math.random() * colors.length)];
+                heart.style.animationDuration = Math.random() * 5 + 5 + "s";
+                container.appendChild(heart);
+            }
+        }
+
+        createHearts();
+    </script>
+</body>
+</html>
