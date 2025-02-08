@@ -108,53 +108,77 @@
         <button onclick="yorumEkle()">Gönder</button>
     </div>
 
-    <script>
-        function yorumEkle() {
-    var adInput = document.getElementById("adInput");
-    var yorumInput = document.getElementById("yorumInput");
-    var yorumlarDiv = document.getElementById("yorumlar");
-
-    if (adInput.value.trim() !== "" && yorumInput.value.trim() !== "") {
-        var yorum = {
-            ad: adInput.value,
-            metin: yorumInput.value
+    
+    <script type="module">
+        // Firebase modüllerini içe aktar
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+      
+        const firebaseConfig = {
+          apiKey:"AIzaSyBB7UCJP9OP9t-t2skdP-KhgpnLa77IAro", 
+          authDomain: "esmaninwebsitesi-27280.firebaseapp.com",
+          databaseURL: "https://esmaninwebsitesi-27280-default-rtdb.firebaseio.com",
+          projectId: "esmaninwebsitesi-27280",
+          storageBucket: "esmaninwebsitesi-27280.firebasestorage.app",
+          messagingSenderId: "338856424812",
+          appId: "1:338856424812:web:b0fc7fa0137da86b0def49",
+          measurementId: "G-GS91SBV0G3"
         };
-
-        var yorumlar = JSON.parse(localStorage.getItem("yorumlar")) || [];
-        yorumlar.push(yorum);
-        localStorage.setItem("yorumlar", JSON.stringify(yorumlar));
-
-        yorumGoster();
-        adInput.value = "";
-        yorumInput.value = "";
-    }
-}
-function yorumGoster() {
-    var yorumlarDiv = document.getElementById("yorumlar");
-    yorumlarDiv.innerHTML = "";
-
-    var yorumlar = JSON.parse(localStorage.getItem("yorumlar")) || [];
-
-    yorumlar.forEach((yorum, index) => {
-        var yorumP = document.createElement("div");
-        yorumP.classList.add("yorum");
-        yorumP.innerHTML = `<strong>${yorum.ad}:</strong> ${yorum.metin} 
-                            <button class="sil-btn" onclick="yorumSil(${index})">Sil</button>`;
-        yorumlarDiv.appendChild(yorumP);
-    });
-}
-function yorumSil(index) {
-            var yorumlar = JSON.parse(localStorage.getItem("yorumlar")) || [];
-            yorumlar.splice(index, 1);
-            localStorage.setItem("yorumlar", JSON.stringify(yorumlar));
-            yorumGoster();
+      
+        // Firebase'i başlat
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+      
+        //  Yorumları Firebase'e kaydetme fonksiyonu
+        window.yorumEkle = function() {
+          var adInput = document.getElementById("adInput").value.trim();
+          var yorumInput = document.getElementById("yorumInput").value.trim();
+      
+          if (adInput !== "" && yorumInput !== "") {
+            const yeniYorumRef = push(ref(database, "yorumlar"));
+            set(yeniYorumRef, {
+              id: yeniYorumRef.key,  // Firebase içindeki benzersiz anahtar
+              ad: adInput,
+              metin: yorumInput
+            }).then(() => {
+              document.getElementById("adInput").value = "";
+              document.getElementById("yorumInput").value = "";
+            }).catch((error) => {
+              console.error("Yorum eklenirken hata oluştu:", error);
+            });
+          }
+        };
+      
+        //  Yorumları Firebase’den alıp ekrana yazdıran fonksiyon
+        function yorumlariYukle() {
+          const yorumlarDiv = document.getElementById("yorumlar");
+          yorumlarDiv.innerHTML = ""; // Önce temizle
+      
+          const yorumlarRef = ref(database, "yorumlar");
+          onValue(yorumlarRef, (snapshot) => {
+            yorumlarDiv.innerHTML = ""; // Güncel listeyi tekrar ekle
+            snapshot.forEach((childSnapshot) => {
+              const yorum = childSnapshot.val();
+              const yeniYorum = document.createElement("p");
+              yeniYorum.innerHTML = `<strong>${yorum.ad}:</strong> ${yorum.metin} 
+                <button onclick="yorumuSil('${yorum.id}')">Sil</button>`;
+              yorumlarDiv.appendChild(yeniYorum);
+            });
+          });
         }
-
-
-// Sayfa açıldığında yorumları yükle
-yorumGoster()
-        
-
+      
+        //  Yorum silme fonksiyonu
+        window.yorumuSil = function(yorumID) {
+          const yorumRef = ref(database, "yorumlar/" + yorumID);
+          remove(yorumRef).then(() => {
+            console.log("Yorum başarıyla silindi.");
+          }).catch((error) => {
+            console.error("Yorum silinirken hata oluştu:", error);
+          });
+        };
+      
+        //  Sayfa açıldığında yorumları Firebase'den yükle
+        yorumlariYukle();
         // Kalpleri rastgele arka plana ekleyen fonksiyon
         function createHearts() {
             const colors = ["#ff91a4", "#ffffff", "#c084fc", "#aee2ff"]; // Pembe, Beyaz, Mor, Bebek Mavisi
